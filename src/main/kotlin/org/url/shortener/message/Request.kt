@@ -5,5 +5,5 @@ import org.url.shortener.org.url.shortener.message.deserializers.RequestDeserial
 
 @JsonDeserialize(using = RequestDeserializer::class)
 interface Request {
-    var longUrl: String?
+    var longUrl: String
 }

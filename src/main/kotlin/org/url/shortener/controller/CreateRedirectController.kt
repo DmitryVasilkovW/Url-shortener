@@ -1,11 +1,5 @@
 package org.url.shortener.org.url.shortener.controller
 
-import com.example.shortener.messages.CreateRedirectRequest
-import com.example.shortener.messages.CreateRedirectResponse
-import com.example.shortener.messages.Request
-import com.example.shortener.messages.VipCreateRedirectRequest
-import com.example.shortener.services.UrlShortenerService
-import com.example.shortener.services.VipUrlShortenerService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.util.Pair
 import org.springframework.http.HttpStatus
@@ -31,27 +25,25 @@ class CreateRedirectController {
 
     @RequestMapping(value = ["/make_shorter"], method = [RequestMethod.POST])
     fun createRedirect(@RequestBody request: Request): ResponseEntity<CreateRedirectResponse?> {
-        var shortUrlAndSecret: Pair<String?, String?>? = null
+        var shortUrlAndSecret: Pair<String, String>? = null
 
         if (request is CreateRedirectRequest) {
-            shortUrlAndSecret = shortener.shorten(request.longUrl)
+            shortUrlAndSecret = shortener!!.shorten(request.longUrl)
         } else if (request is VipCreateRedirectRequest) {
-            shortUrlAndSecret = request.vipKey?.let {
+            shortUrlAndSecret = request.vipKey?.let { vipKey ->
                 vipShortener?.shorten(
                     request.longUrl,
-                    it,
+                    vipKey,
                     request.timeToLive,
                     request.timeToLiveUnit
-                )?:
+                )
             }
         }
 
-        return if (shortUrlAndSecret == null) ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body<CreateRedirectResponse?>(null) else ResponseEntity.ok<CreateRedirectResponse>(
-            CreateRedirectResponse(
-                shortUrlAndSecret.first,
-                shortUrlAndSecret.second
-            )
-        )
+        return if (shortUrlAndSecret == null) {
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null)
+        } else {
+            ResponseEntity.ok(CreateRedirectResponse(shortUrlAndSecret.first, shortUrlAndSecret.second))
+        }
     }
 }
