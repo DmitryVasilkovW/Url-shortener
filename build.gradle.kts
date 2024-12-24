@@ -1,6 +1,7 @@
 plugins {
     id("org.springframework.boot") version "3.4.1"
     id("io.spring.dependency-management") version "1.1.7"
+    id("org.jetbrains.kotlin.plugin.jpa") version "2.0.21"
 
     kotlin("jvm") version "2.0.21"
     kotlin("plugin.spring") version "2.0.21"
@@ -23,6 +24,8 @@ dependencies {
     // Kotlin dependencies
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk22")
+
+    implementation("commons-codec:commons-codec:1.17.1")
 
     // Testing
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
