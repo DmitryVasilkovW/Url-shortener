@@ -1,25 +1,41 @@
 package org.url.shortener.model;
 
-import jakarta.persistence.*
-import java.util.Date
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.Id
+import jakarta.persistence.Table
+import java.util.*
 
 @Entity
 @Table(name = "redirections")
-data class Redirection(
+class Redirection {
     @Id
     @GeneratedValue
-    val id: Long? = null,
+    private val id: Long? = null
 
     @Column(unique = true)
-    var shortKey: String,
+    var shortKey: String? = null
 
     @Column(unique = true)
-    var secretKey: String,
+    private var secretKey: String? = null
 
-    var longUrl: String,
-    var creationDate: Date = Date(),
+    var longUrl: String? = null
+
+    var creationDate: Date? = null
+        private set
     var usageCount: Long = 0
-) {
+        private set
+
+    constructor() // needed by hibernate
+
+    constructor(longUrl: String?, shortKey: String?, secretKey: String?) {
+        this.longUrl = longUrl
+        this.shortKey = shortKey
+        this.secretKey = secretKey
+        this.creationDate = Date()
+    }
+
     fun incrementUsageCount() {
         usageCount++
     }

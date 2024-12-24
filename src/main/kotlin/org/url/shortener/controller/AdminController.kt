@@ -27,27 +27,31 @@ class AdminController : BaseController() {
         var vipRedirection: VipRedirection? = null
 
         try {
-            redirection = service.findBySecretKey(secretKey)
+            redirection = secretKey?.let { service?.findBySecretKey(it) }
         } catch (ignored: Exception) {
         }
         try {
-            vipRedirection = vipService.findBySecretKey(secretKey)
+            vipRedirection = vipService?.findBySecretKey(secretKey)
         } catch (ignored: Exception) {
         }
 
         if (redirection != null) {
             return ResponseEntity.ok<Any?>(
-                AdminGetStatsResponse(
-                    redirection.getCreationDate(),
-                    redirection.getUsageCount()
-                )
+                redirection.creationDate?.let {
+                    AdminGetStatsResponse(
+                        it,
+                        redirection.usageCount
+                    )
+                }
             )
         } else if (vipRedirection != null) {
             return ResponseEntity.ok<Any?>(
-                AdminGetStatsResponse(
-                    vipRedirection.getCreationDate(),
-                    vipRedirection.getUsageCount()
-                )
+                vipRedirection.creationDate?.let {
+                    AdminGetStatsResponse(
+                        it,
+                        vipRedirection.usageCount
+                    )
+                }
             )
         }
 
@@ -57,11 +61,13 @@ class AdminController : BaseController() {
     @RequestMapping(value = ["admin/{secretKey}"], method = [RequestMethod.DELETE])
     fun deleteRedirection(@PathVariable secretKey: String?) {
         try {
-            service.deleteRedirection(secretKey)
+            if (secretKey != null) {
+                service?.deleteRedirection(secretKey)
+            }
         } catch (ignored: Exception) {
         }
         try {
-            vipService.deleteRedirection(secretKey)
+            vipService?.deleteRedirection(secretKey)
         } catch (ignored: Exception) {
         }
     }

@@ -1,4 +1,4 @@
-package org.url.shortener.org.url.shortener.message.deserializers
+package org.url.shortener.org.url.shortener.message.deserializer
 
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.DeserializationContext
@@ -6,11 +6,12 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import org.url.shortener.org.url.shortener.message.CreateRedirectRequest
 import org.url.shortener.org.url.shortener.message.Request
+import org.url.shortener.org.url.shortener.message.builder.VipCreateRedirectRequestBuilderImpl
 import java.io.IOException
 
 class RequestDeserializer : StdDeserializer<Request?>(Request::class.java) {
     @Throws(IOException::class)
-    override fun deserialize(jp: JsonParser, ctxt: DeserializationContext): Request {
+    override fun deserialize(jp: JsonParser, ctxt: DeserializationContext): Request? {
         val codec = jp.codec
         val node = codec.readTree<JsonNode>(jp)
 
@@ -34,9 +35,9 @@ class RequestDeserializer : StdDeserializer<Request?>(Request::class.java) {
             return VipCreateRedirectRequestBuilderImpl()
                 .withLongUrl(longUrl)
                 .withVipKey(vipKey)
-                .withTimeToLive(timeToLive)
-                .withTimeToLiveUnit(timeToLiveUnit)
-                .build()
+                ?.withTimeToLive(timeToLive)
+                ?.withTimeToLiveUnit(timeToLiveUnit)
+                ?.build()
         }
 
         throw IllegalArgumentException("Unknown request type")

@@ -91,7 +91,7 @@ class VipUrlShortenerService {
     fun resolve(shortKey: String?): VipRedirection {
         invalidKeysCleaner!!.cleanInvalidKeys()
 
-        val redirectionO: Optional<VipRedirection>? = shortKey?.let { repo?.findByVipKey(it) }
+        val redirectionO: Optional<VipRedirection>? = shortKey?.let { repo?.findByShortKey(it) }
         if (redirectionO?.isPresent() == true) {
             val redirection: VipRedirection = redirectionO.get()
             redirection.incrementUsageCount()

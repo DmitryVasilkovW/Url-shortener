@@ -28,7 +28,7 @@ class CreateRedirectController {
         var shortUrlAndSecret: Pair<String, String>? = null
 
         if (request is CreateRedirectRequest) {
-            shortUrlAndSecret = shortener!!.shorten(request.longUrl)
+            shortUrlAndSecret = request.longUrl?.let { shortener?.shorten(it) }
         } else if (request is VipCreateRedirectRequest) {
             shortUrlAndSecret = request.vipKey?.let { vipKey ->
                 vipShortener?.shorten(

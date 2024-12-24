@@ -1,7 +1,7 @@
 package org.url.shortener.org.url.shortener.message
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import org.url.shortener.org.url.shortener.message.deserializers.RequestDeserializer
+import org.url.shortener.org.url.shortener.message.deserializer.RequestDeserializer
 
 @JsonDeserialize(using = RequestDeserializer::class)
 interface Request {

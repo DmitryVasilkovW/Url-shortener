@@ -23,7 +23,7 @@ dependencies {
 
     // Kotlin dependencies
     implementation("org.jetbrains.kotlin:kotlin-reflect")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk22")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.1.0")
 
     implementation("commons-codec:commons-codec:1.17.1")
 

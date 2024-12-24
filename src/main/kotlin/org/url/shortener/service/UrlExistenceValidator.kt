@@ -12,7 +12,7 @@ class UrlExistenceValidator @Autowired constructor(
 ) {
 
     fun validateAndGetError(key: String): String? {
-        val vipRedirection = vipRedirectionRepo.findByVipKey(key)
+        val vipRedirection = vipRedirectionRepo.findByShortKey(key)
         val redirection = redirectionRepo.findByShortKey(key)
 
         return if (vipRedirection.isPresent || redirection.isPresent) {

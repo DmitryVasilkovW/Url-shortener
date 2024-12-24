@@ -1,11 +1,11 @@
 package org.url.shortener.org.url.shortener.message
 
 class CreateRedirectRequest : Request {
-    override var longUrl: String? = null
+    override lateinit var longUrl: String
 
     constructor()
 
-    constructor(longUrl: String?) {
+    constructor(longUrl: String) {
         this.longUrl = longUrl
     }
 }

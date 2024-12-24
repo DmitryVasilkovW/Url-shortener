@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 class VipCreateRedirectRequest : Request {
-    var longUrl: String? = null
+    override lateinit var longUrl: String
     var vipKey: String? = null
     var timeToLive: Int = 0
     var timeToLiveUnit: String? = null
@@ -13,7 +13,9 @@ class VipCreateRedirectRequest : Request {
     constructor()
 
     constructor(longUrl: String?, vipKey: String?, timeToLive: Int, timeToLiveUnit: String?) {
-        this.longUrl = longUrl
+        if (longUrl != null) {
+            this.longUrl = longUrl
+        }
         this.vipKey = vipKey
         this.timeToLive = timeToLive
         this.timeToLiveUnit = timeToLiveUnit

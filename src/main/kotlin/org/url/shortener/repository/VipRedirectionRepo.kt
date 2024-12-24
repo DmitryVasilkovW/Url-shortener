@@ -8,7 +8,7 @@ import java.util.*
 
 @Repository
 interface VipRedirectionRepo : CrudRepository<VipRedirection, Long> {
-    fun findByVipKey(vipKey: String): Optional<VipRedirection>
+    fun findByShortKey(shortKey: String): Optional<VipRedirection>
     fun findBySecretKey(secretKey: String): Optional<VipRedirection>
     override fun deleteById(id: Long)
 
