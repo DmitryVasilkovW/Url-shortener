@@ -5,15 +5,15 @@ const app = express();
 app.set('views', path.join(__dirname, '/'));
 app.set('view engine', 'pug');
 
+// Настройка для отдачи статики (CSS, JS и другие файлы)
+app.use(express.static(path.join(__dirname, 'public')));
+
 const port: number = 3000;
-const backendUrl = "http://backend:3001";
 
 app.get('/', async (req, res) => {
-    const data = "ssd"
-
-    res.render('index.pug', { title: "KIT Frontend", cat_url: data });
+    res.render('index.pug', { title: "Url shortener" });
 });
 
 app.listen(port, () => {
-    console.log(`Frontend app listening on port ${port}`)
-})
+    console.log(`Frontend app listening on port ${port}`);
+});

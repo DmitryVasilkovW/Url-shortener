@@ -1,5 +1,51 @@
 html
     head
         title= title
+        style.
+            body {
+                font-family: Arial, sans-serif;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                margin: 0;
+                background-color: #f4f4f4;
+            }
+
+            .button-container {
+                display: flex;
+                gap: 20px;
+            }
+
+            .button {
+                padding: 20px 40px;
+                font-size: 18px;
+                cursor: pointer;
+                border: none;
+                border-radius: 8px;
+                transition: background-color 0.3s ease;
+            }
+
+            .normal-button {
+                background-color: #4CAF50;
+                color: white;
+            }
+
+            .normal-button:hover {
+                background-color: #45a049;
+            }
+
+            .private-button {
+                background-color: #f44336;
+                color: white;
+            }
+
+            .private-button:hover {
+                background-color: #e53935;
+            }
+
     body
-        img(src= cat_url)
+        h1 Add Your Links
+        .button-container
+            button.normal-button Обычная ссылка
+            button.private-button Приватная ссылка
