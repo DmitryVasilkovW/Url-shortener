@@ -1,0 +1,21 @@
+doctype html
+html
+    head
+        title URL Shortener
+        link(rel="stylesheet" href="/styles.css")
+    body
+        div.container
+            h1 URL Shortener
+            div.button-container
+                button.btn#vip-link Создать VIP ссылку
+                button.btn#regular-link Создать обычную ссылку
+
+        // Всплывающее окно для ввода
+        div.modal#modal.hidden
+            div.modal-content
+                h2 Введите данные
+                input(type="text" placeholder="Введите URL")
+                button#submit-btn Отправить
+                button#close-btn Закрыть
+
+        script(src="/app.js")
