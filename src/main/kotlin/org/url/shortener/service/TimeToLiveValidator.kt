@@ -9,6 +9,10 @@ class TimeToLiveValidator {
     private val criticalTimeToLiveInTwoDays = 172800
 
     fun validateAndGetError(timeToLive: Int, timeToLiveUnit: String): String? {
+        if (timeToLive < 0) {
+            return "Invalid time to live value: $timeToLive"
+        }
+
         return try {
             val unit = TimeToLiveUnit.valueOf(timeToLiveUnit.uppercase())
             val totalSeconds = unit.seconds * timeToLive
@@ -20,7 +24,6 @@ class TimeToLiveValidator {
             }
         } catch (e: IllegalArgumentException) {
             "Invalid time to live unit: $timeToLiveUnit"
-        }.takeIf { timeToLive < 0 }
-            ?: "Invalid time to live unit: $timeToLiveUnit"
+        }
     }
 }
