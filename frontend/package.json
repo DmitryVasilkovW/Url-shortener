@@ -1,16 +1,16 @@
 {
-  "name": "url-shortener",
+  "name": "kit_homework_frontend",
   "version": "1.0.0",
   "dependencies": {
     "express": "latest",
-    "jade": "latest"
+    "pug": "latest"
   },
   "devDependencies": {
     "@types/express": "^4.17.21",
     "typescript": "^5.5.3"
   },
   "scripts": {
-    "build": "tsc src/app.ts",
-    "start": "node src/app.js"
+    "build": "tsc frontend.ts",
+    "start": "node frontend.js"
   }
 }
