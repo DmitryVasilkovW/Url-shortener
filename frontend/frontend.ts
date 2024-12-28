@@ -16,7 +16,7 @@ app.get('/', (req, res) => {
     res.render('index.pug', { title: "Url Shortener" });
 });
 
-app.post('/shorten', async (req, res) => {
+app.post('/vip_shorten', async (req, res) => {
     const { longUrl, vipKey, timeToLive, timeToLiveUnit } = req.body;
 
     try {
@@ -31,6 +31,30 @@ app.post('/shorten', async (req, res) => {
                 timeToLive,
                 timeToLiveUnit,
             }),
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            return res.status(response.status).json(error);
+        }
+
+        const data = await response.json();
+        res.json(data);
+    } catch (error) {
+        res.status(500).json({ error: "Failed to connect to the backend" });
+    }
+});
+
+app.post('/common_shorten', async (req, res) => {
+    const { longUrl } = req.body;
+
+    try {
+        const response = await fetch(`${backendUrl}/make_shorter`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ longUrl }),
         });
 
         if (!response.ok) {
