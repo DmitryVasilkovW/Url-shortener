@@ -5,47 +5,102 @@ html
             body {
                 font-family: Arial, sans-serif;
                 display: flex;
-                justify-content: center;
+                flex-direction: column;
                 align-items: center;
+                justify-content: center;
                 height: 100vh;
                 margin: 0;
                 background-color: #f4f4f4;
             }
 
-            .button-container {
+            .form-container {
+                width: 100%;
+                max-width: 400px;
                 display: flex;
-                gap: 20px;
+                flex-direction: column;
+                gap: 15px;
+                background: white;
+                padding: 20px;
+                border-radius: 10px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             }
 
-            .button {
-                padding: 20px 40px;
-                font-size: 18px;
+            input, select, button {
+                padding: 10px;
+                font-size: 16px;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+            }
+
+            button {
+                background-color: #4CAF50;
+                color: white;
                 cursor: pointer;
-                border: none;
-                border-radius: 8px;
                 transition: background-color 0.3s ease;
             }
 
-            .normal-button {
-                background-color: #4CAF50;
-                color: white;
-            }
-
-            .normal-button:hover {
+            button:hover {
                 background-color: #45a049;
             }
 
-            .private-button {
+            .error, .success {
+                font-size: 14px;
+                padding: 10px;
+                border-radius: 5px;
+            }
+
+            .error {
                 background-color: #f44336;
                 color: white;
             }
 
-            .private-button:hover {
-                background-color: #e53935;
+            .success {
+                background-color: #4CAF50;
+                color: white;
             }
-
     body
-        h1 Add Your Links
-        .button-container
-            button.normal-button Обычная ссылка
-            button.private-button Приватная ссылка
+        h1= title
+        .form-container
+            form(id="shortenerForm")
+                input(type="url" placeholder="Введите длинную ссылку" name="longUrl" required)
+                input(type="text" placeholder="VIP ключ (опционально)" name="vipKey")
+                input(type="number" placeholder="TTL (время жизни)" name="timeToLive" value=10 required)
+                select(name="timeToLiveUnit")
+                    option(value="SECONDS") Секунды
+                    option(value="MINUTES") Минуты
+                    option(value="HOURS" selected) Часы
+                    option(value="DAYS") Дни
+                button(type="submit") Сократить ссылку
+            .error.hidden Ошибка: Проверьте данные или попробуйте позже.
+            .success.hidden Сокращённая ссылка: <a href="#" target="_blank"></a>
+        script.
+            document.getElementById('shortenerForm').addEventListener('submit', async function (event) {
+                event.preventDefault();
+                const formData = new FormData(this);
+                const jsonData = {};
+                formData.forEach((value, key) => jsonData[key] = value);
+
+                try {
+                    const response = await fetch('/shorten', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(jsonData)
+                    });
+
+                    const result = await response.json();
+                    if (response.ok) {
+                        document.querySelector('.success').classList.remove('hidden');
+                        document.querySelector('.success a').textContent = result.shortUrl;
+                        document.querySelector('.success a').href = result.shortUrl;
+                        document.querySelector('.error').classList.add('hidden');
+                    } else {
+                        document.querySelector('.error').textContent = `Ошибка: ${result.error}`;
+                        document.querySelector('.error').classList.remove('hidden');
+                        document.querySelector('.success').classList.add('hidden');
+                    }
+                } catch (error) {
+                    document.querySelector('.error').textContent = "Ошибка: невозможно соединиться с сервером.";
+                    document.querySelector('.error').classList.remove('hidden');
+                    document.querySelector('.success').classList.add('hidden');
+                }
+            });
