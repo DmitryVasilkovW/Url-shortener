@@ -20,7 +20,7 @@ app.post('/shorten', async (req, res) => {
     const { longUrl, vipKey, timeToLive, timeToLiveUnit } = req.body;
 
     try {
-        const response = await fetch(`${backendUrl}/make_shorter`, {
+        const response = await fetch(`${backendUrl}/make_vip_shorter`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
