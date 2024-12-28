@@ -1,5 +1,5 @@
 {
-  "name": "kit_homework_frontend",
+  "name": "url_shortener_frontend",
   "version": "1.0.0",
   "dependencies": {
     "express": "latest",
