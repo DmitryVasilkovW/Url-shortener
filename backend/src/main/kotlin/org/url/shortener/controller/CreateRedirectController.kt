@@ -24,20 +24,25 @@ class CreateRedirectController {
     var vipShortener: VipUrlShortenerService? = null
 
     @RequestMapping(value = ["/make_shorter"], method = [RequestMethod.POST])
-    fun createRedirect(@RequestBody request: Request): ResponseEntity<CreateRedirectResponse?> {
-        var shortUrlAndSecret: Pair<String, String>? = null
+    fun createRedirect(@RequestBody request: CreateRedirectRequest): ResponseEntity<CreateRedirectResponse?> {
+        val shortUrlAndSecret = request.longUrl?.let { shortener?.shorten(it) }
 
-        if (request is CreateRedirectRequest) {
-            shortUrlAndSecret = request.longUrl?.let { shortener?.shorten(it) }
-        } else if (request is VipCreateRedirectRequest) {
-            shortUrlAndSecret = request.vipKey?.let { vipKey ->
-                vipShortener?.shorten(
-                    request.longUrl,
-                    vipKey,
-                    request.timeToLive,
-                    request.timeToLiveUnit
-                )
-            }
+        return if (shortUrlAndSecret == null) {
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null)
+        } else {
+            ResponseEntity.ok(CreateRedirectResponse(shortUrlAndSecret.first, shortUrlAndSecret.second))
+        }
+    }
+
+    @RequestMapping(value = ["/make_vip_shorter"], method = [RequestMethod.POST])
+    fun createVipRedirect(@RequestBody request: VipCreateRedirectRequest): ResponseEntity<CreateRedirectResponse?> {
+        val shortUrlAndSecret = request.vipKey?.let { vipKey ->
+            vipShortener?.shorten(
+                request.longUrl,
+                vipKey,
+                request.timeToLive,
+                request.timeToLiveUnit
+            )
         }
 
         return if (shortUrlAndSecret == null) {
