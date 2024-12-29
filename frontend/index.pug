@@ -170,9 +170,9 @@ html
                         document.querySelector('.success_delete').classList.add('hidden');
                         document.querySelector('.success_info').classList.add('hidden');
                         document.querySelector('.success_url').classList.remove('hidden');
-                        document.querySelector('.success_url a').textContent = result.shortUrl || 'Успешно!';
+                        document.querySelector('.success_url a').textContent = ' ' + result.shortUrl || 'Успешно!';
                         document.querySelector('.success_url a').href = result.shortUrl || '#';
-                        document.querySelector('.success_url b').textContent = result.secretKey || 'Нет ключа';
+                        document.querySelector('.success_url b').textContent = ' ' + result.secretKey || 'Нет ключа';
                         document.querySelector('.error').classList.add('hidden');
                     } else {
                         document.querySelector('.error').textContent = `Ошибка: ${result.error}`;
@@ -215,7 +215,7 @@ html
                         document.querySelector('.success_url').classList.add('hidden');
                         document.querySelector('.success_info').classList.add('hidden');
                         document.querySelector('.success_delete').classList.remove('hidden');
-                        document.querySelector('.success_delete a').textContent = result.message || 'Удаление прошло успешно!';
+                        document.querySelector('.success_delete a').textContent = 'Удаление прошло успешно!';
                         document.querySelector('.error').classList.add('hidden');
                     } else {
                         document.querySelector('.error').textContent = `Ошибка: ${result.error || 'Неизвестная ошибка'}`;
@@ -258,8 +258,8 @@ html
                         document.querySelector('.success_url').classList.add('hidden');
                         document.querySelector('.success_delete').classList.add('hidden');
                         document.querySelector('.success_info').classList.remove('hidden');
-                        document.querySelector('.success_info a').textContent = result.creationDate;
-                        document.querySelector('.success_info b').textContent = result.usageCount;
+                        document.querySelector('.success_info a').textContent = ' ' + result.creationDate;
+                        document.querySelector('.success_info b').textContent = ' ' + result.usageCount;
                         document.querySelector('.error').classList.add('hidden');
                     } else {
                         document.querySelector('.error').textContent = `Ошибка: ${result.error || 'Неизвестная ошибка'}`;
