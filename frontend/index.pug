@@ -59,7 +59,7 @@ html
                 background-color: #45a049;
             }
 
-            .error, .success {
+            .error, .success_url, .success_info, .success_delete {
                 font-size: 14px;
                 padding: 10px;
                 border-radius: 5px;
@@ -70,9 +70,9 @@ html
                 color: white;
             }
 
-            .success {
-                background-color: #9eeea3;
-                color: #b0aeae;
+            .success_url, .success_info, .success_delete {
+                background-color: #a6a2a2;
+                color: #000000;
                 padding: 20px;
                 font-size: 18px;
                 border-radius: 10px;
@@ -116,11 +116,20 @@ html
                 button(type="submit") посмотреть информацию
 
         .error.hidden Ошибка: Проверьте данные или попробуйте позже.
-        .success.hidden Сокращённая ссылка:
+        .success_url.hidden Сокращённая ссылка:
             a(href="#" target="_blank")
             br
             | Ключ для управления ссылкой:
             b
+
+        .success_info.hidden Дата создания:
+            a
+            br
+            | Количество использований:
+            b
+
+        .success_delete.hidden
+            a
 
         script.
             function showForm(formId) {
@@ -152,20 +161,22 @@ html
 
                     const result = await response.json();
                     if (response.ok) {
-                        document.querySelector('.success').classList.remove('hidden');
-                        document.querySelector('.success a').textContent = result.shortUrl || 'Успешно!';
-                        document.querySelector('.success a').href = result.shortUrl || '#';
-                        document.querySelector('.success b').textContent = result.secretKey || 'Нет ключа';
+                        document.querySelector('.success_delete').classList.add('hidden');
+                        document.querySelector('.success_info').classList.add('hidden');
+                        document.querySelector('.success_url').classList.remove('hidden');
+                        document.querySelector('.success_url a').textContent = result.shortUrl || 'Успешно!';
+                        document.querySelector('.success_url a').href = result.shortUrl || '#';
+                        document.querySelector('.success_url b').textContent = result.secretKey || 'Нет ключа';
                         document.querySelector('.error').classList.add('hidden');
                     } else {
                         document.querySelector('.error').textContent = `Ошибка: ${result.error}`;
                         document.querySelector('.error').classList.remove('hidden');
-                        document.querySelector('.success').classList.add('hidden');
+                        document.querySelector('.success_url').classList.add('hidden');
                     }
                 } catch (error) {
                     document.querySelector('.error').textContent = "Ошибка: невозможно соединиться с сервером.";
                     document.querySelector('.error').classList.remove('hidden');
-                    document.querySelector('.success').classList.add('hidden');
+                    document.querySelector('.success_url').classList.add('hidden');
                 }
             }
 
@@ -181,7 +192,7 @@ html
                 if (!secretKey) {
                     document.querySelector('.error').textContent = "Ошибка: не указан ключ!";
                     document.querySelector('.error').classList.remove('hidden');
-                    document.querySelector('.success').classList.add('hidden');
+                    document.querySelector('.success_url').classList.add('hidden');
                     return;
                 }
 
@@ -195,19 +206,20 @@ html
 
                     const result = await response.json();
                     if (response.ok) {
-                        document.querySelector('.success').classList.remove('hidden');
-                        document.querySelector('.success a').textContent = result.message || 'Удаление прошло успешно!';
-                        document.querySelector('.success a').href = '#';
+                        document.querySelector('.success_url').classList.add('hidden');
+                        document.querySelector('.success_info').classList.add('hidden');
+                        document.querySelector('.success_delete').classList.remove('hidden');
+                        document.querySelector('.success_delete a').textContent = result.message || 'Удаление прошло успешно!';
                         document.querySelector('.error').classList.add('hidden');
                     } else {
                         document.querySelector('.error').textContent = `Ошибка: ${result.error || 'Неизвестная ошибка'}`;
                         document.querySelector('.error').classList.remove('hidden');
-                        document.querySelector('.success').classList.add('hidden');
+                        document.querySelector('.success_delete').classList.add('hidden');
                     }
                 } catch (error) {
                     document.querySelector('.error').textContent = "Ошибка: невозможно соединиться с сервером.";
                     document.querySelector('.error').classList.remove('hidden');
-                    document.querySelector('.success').classList.add('hidden');
+                    document.querySelector('.success_delete').classList.add('hidden');
                 }
             }
 
@@ -223,7 +235,7 @@ html
                 if (!secretKey) {
                     document.querySelector('.error').textContent = "Ошибка: не указан ключ!";
                     document.querySelector('.error').classList.remove('hidden');
-                    document.querySelector('.success').classList.add('hidden');
+                    document.querySelector('.success_info').classList.add('hidden');
                     return;
                 }
 
@@ -237,18 +249,20 @@ html
 
                     const result = await response.json();
                     if (response.ok) {
-                        document.querySelector('.success').classList.remove('hidden');
-                        document.querySelector('.success a').textContent = result.creationDate;
-                        document.querySelector('.success a').href = '#';
+                        document.querySelector('.success_url').classList.add('hidden');
+                        document.querySelector('.success_delete').classList.add('hidden');
+                        document.querySelector('.success_info').classList.remove('hidden');
+                        document.querySelector('.success_info a').textContent = result.creationDate;
+                        document.querySelector('.success_info b').textContent = result.usageCount;
                         document.querySelector('.error').classList.add('hidden');
                     } else {
                         document.querySelector('.error').textContent = `Ошибка: ${result.error || 'Неизвестная ошибка'}`;
                         document.querySelector('.error').classList.remove('hidden');
-                        document.querySelector('.success').classList.add('hidden');
+                        document.querySelector('.success_info').classList.add('hidden');
                     }
                 } catch (error) {
                     document.querySelector('.error').textContent = "Ошибка: невозможно соединиться с сервером.";
                     document.querySelector('.error').classList.remove('hidden');
-                    document.querySelector('.success').classList.add('hidden');
+                    document.querySelector('.success_info').classList.add('hidden');
                 }
             }
