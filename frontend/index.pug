@@ -13,16 +13,32 @@ html
                 background-color: #f4f4f4;
             }
 
-            .form-container {
+            .menu-buttons, .form-container {
                 width: 100%;
                 max-width: 400px;
                 display: flex;
                 flex-direction: column;
                 gap: 15px;
-                background: white;
-                padding: 20px;
-                border-radius: 10px;
-                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                margin-bottom: 20px;
+            }
+
+            .menu-buttons button {
+                background-color: #007BFF;
+                color: white;
+                padding: 10px;
+                font-size: 16px;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                transition: background-color 0.3s ease;
+            }
+
+            .menu-buttons button:hover {
+                background-color: #0056b3;
+            }
+
+            .hidden {
+                display: none;
             }
 
             input, select, button {
@@ -57,11 +73,22 @@ html
             .success {
                 background-color: #4CAF50;
                 color: white;
+                padding: 20px;
+                font-size: 18px;
+                border-radius: 10px;
+                max-width: 500px;
+                margin: 20px auto;
+                text-align: center;
             }
     body
         h1= title
-        .form-container
-            form(id="shortenerForm")
+        .menu-buttons
+            button(onclick="showForm('vip')") Создать VIP ссылку
+            button(onclick="showForm('regular')") Создать обычную ссылку
+            button(onclick="showForm('delete')") Удалить ссылку
+
+        .form-container.hidden#vipForm
+            form(id="vipShortenerForm")
                 input(type="url" placeholder="Введите длинную ссылку" name="longUrl" required)
                 input(type="text" placeholder="VIP ключ (опционально)" name="vipKey")
                 input(type="number" placeholder="TTL (время жизни)" name="timeToLive" value=10 required)
@@ -70,18 +97,48 @@ html
                     option(value="MINUTES") Минуты
                     option(value="HOURS" selected) Часы
                     option(value="DAYS") Дни
-                button(type="submit") Сократить ссылку
-            .error.hidden Ошибка: Проверьте данные или попробуйте позже.
-            .success.hidden Сокращённая ссылка: <a href="#" target="_blank"></a>
+                button(type="submit") Сократить VIP ссылку
+
+        .form-container.hidden#regularForm
+            form(id="regularShortenerForm")
+                input(type="url" placeholder="Введите длинную ссылку" name="longUrl" required)
+                button(type="submit") Сократить обычную ссылку
+
+        .form-container.hidden#deleteForm
+            form(id="deleteShortenerForm")
+                input(type="text" placeholder="Введите ключ ссылки" name="shortKey" required)
+                button(type="submit") Удалить ссылку
+
+        .error.hidden Ошибка: Проверьте данные или попробуйте позже.
+        .success.hidden Сокращённая ссылка:
+            a(href="#" target="_blank")
+            br
+            | Ключ для управления ссылкой:
+            b
+
         script.
-            document.getElementById('shortenerForm').addEventListener('submit', async function (event) {
+            function showForm(formId) {
+                document.querySelectorAll('.form-container').forEach(form => form.classList.add('hidden'));
+                document.getElementById(formId + 'Form').classList.remove('hidden');
+            }
+
+            document.getElementById('vipShortenerForm').addEventListener('submit', async function (event) {
                 event.preventDefault();
-                const formData = new FormData(this);
+                await handleFormSubmitForUrlCreation('/vip_shorten', this);
+            });
+
+            document.getElementById('regularShortenerForm').addEventListener('submit', async function (event) {
+                event.preventDefault();
+                await handleFormSubmitForUrlCreation('/common_shorten', this);
+            });
+
+            async function handleFormSubmitForUrlCreation(url, form) {
+                const formData = new FormData(form);
                 const jsonData = {};
                 formData.forEach((value, key) => jsonData[key] = value);
 
                 try {
-                    const response = await fetch('/shorten', {
+                    const response = await fetch(url, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(jsonData)
@@ -90,8 +147,9 @@ html
                     const result = await response.json();
                     if (response.ok) {
                         document.querySelector('.success').classList.remove('hidden');
-                        document.querySelector('.success a').textContent = result.shortUrl;
-                        document.querySelector('.success a').href = result.shortUrl;
+                        document.querySelector('.success a').textContent = result.shortUrl || 'Успешно!';
+                        document.querySelector('.success a').href = result.shortUrl || '#';
+                        document.querySelector('.success b').textContent = result.secretKey || 'Нет ключа';
                         document.querySelector('.error').classList.add('hidden');
                     } else {
                         document.querySelector('.error').textContent = `Ошибка: ${result.error}`;
@@ -103,4 +161,48 @@ html
                     document.querySelector('.error').classList.remove('hidden');
                     document.querySelector('.success').classList.add('hidden');
                 }
+            }
+
+            document.getElementById('deleteShortenerForm').addEventListener('submit', async function (event) {
+                event.preventDefault();
+                await handleFormDeleting('/delete', this);
             });
+
+            async function handleFormDeleting(url, form) {
+                const formData = new FormData(form);
+                const secretKey = formData.get("shortKey");
+
+                if (!secretKey) {
+                    document.querySelector('.error').textContent = "Ошибка: не указан ключ!";
+                    document.querySelector('.error').classList.remove('hidden');
+                    document.querySelector('.success').classList.add('hidden');
+                    return;
+                }
+
+                try {
+                    const deleteUrl = `${url}/${secretKey}`;
+
+                    const response = await fetch(deleteUrl, {
+                        method: 'DELETE',
+                        headers: {'Content-Type': 'application/json'},
+                    });
+
+                    const result = await response.json();
+                    console.log("Ответ от сервера:", result);
+                    if (response.ok) {
+                        document.querySelector('.success').classList.remove('hidden');
+                        document.querySelector('.success a').textContent = result.message || 'Удаление прошло успешно!';
+                        document.querySelector('.success a').href = '#';
+                        document.querySelector('.error').classList.add('hidden');
+                    } else {
+                        document.querySelector('.error').textContent = `Ошибка: ${result.error || 'Неизвестная ошибка'}`;
+                        document.querySelector('.error').classList.remove('hidden');
+                        document.querySelector('.success').classList.add('hidden');
+                    }
+                } catch (error) {
+                    document.querySelector('.error').textContent = "Ошибка: невозможно соединиться с сервером.";
+                    document.querySelector('.error').classList.remove('hidden');
+                    document.querySelector('.success').classList.add('hidden');
+                }
+            }
+
