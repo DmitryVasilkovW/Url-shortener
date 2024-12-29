@@ -69,6 +69,28 @@ app.post('/common_shorten', async (req, res) => {
     }
 });
 
+app.delete('/delete/:secretKey', async (req, res) => {
+    const { secretKey } = req.params;
+
+    if (!secretKey) {
+        return res.status(400).json({ error: "Secret key is required" });
+    }
+
+    try {
+        const mainServiceResponse = await fetch(`${backendUrl}/admin/${secretKey}`, { method: 'DELETE' });
+
+        if (!mainServiceResponse.ok) {
+            console.error('Main service deletion failed');
+        }
+
+        res.status(200).json({ message: "Deletion attempted in both services" });
+    } catch (error) {
+        console.error('Error deleting redirection:', error);
+        res.status(500).json({ error: "Failed to delete redirection" });
+    }
+});
+
+
 app.listen(port, () => {
     console.log(`Frontend app listening on port ${port}`);
 });

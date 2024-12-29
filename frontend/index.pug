@@ -73,6 +73,12 @@ html
             .success {
                 background-color: #4CAF50;
                 color: white;
+                padding: 20px;
+                font-size: 18px;
+                border-radius: 10px;
+                max-width: 500px;
+                margin: 20px auto;
+                text-align: center;
             }
     body
         h1= title
@@ -104,7 +110,11 @@ html
                 button(type="submit") Удалить ссылку
 
         .error.hidden Ошибка: Проверьте данные или попробуйте позже.
-        .success.hidden Сокращённая ссылка: <a href="#" target="_blank"></a>
+        .success.hidden Сокращённая ссылка:
+            a(href="#" target="_blank")
+            br
+            | Ключ для управления ссылкой:
+            b
 
         script.
             function showForm(formId) {
@@ -114,20 +124,15 @@ html
 
             document.getElementById('vipShortenerForm').addEventListener('submit', async function (event) {
                 event.preventDefault();
-                await handleFormSubmit('/vip_shorten', this);
+                await handleFormSubmitForUrlCreation('/vip_shorten', this);
             });
 
             document.getElementById('regularShortenerForm').addEventListener('submit', async function (event) {
                 event.preventDefault();
-                await handleFormSubmit('/common_shorten', this);
+                await handleFormSubmitForUrlCreation('/common_shorten', this);
             });
 
-            document.getElementById('deleteShortenerForm').addEventListener('submit', async function (event) {
-                event.preventDefault();
-                await handleFormSubmit('/delete', this);
-            });
-
-            async function handleFormSubmit(url, form) {
+            async function handleFormSubmitForUrlCreation(url, form) {
                 const formData = new FormData(form);
                 const jsonData = {};
                 formData.forEach((value, key) => jsonData[key] = value);
@@ -144,6 +149,7 @@ html
                         document.querySelector('.success').classList.remove('hidden');
                         document.querySelector('.success a').textContent = result.shortUrl || 'Успешно!';
                         document.querySelector('.success a').href = result.shortUrl || '#';
+                        document.querySelector('.success b').textContent = result.secretKey || 'Нет ключа';
                         document.querySelector('.error').classList.add('hidden');
                     } else {
                         document.querySelector('.error').textContent = `Ошибка: ${result.error}`;
@@ -156,3 +162,47 @@ html
                     document.querySelector('.success').classList.add('hidden');
                 }
             }
+
+            document.getElementById('deleteShortenerForm').addEventListener('submit', async function (event) {
+                event.preventDefault();
+                await handleFormDeleting('/delete', this);
+            });
+
+            async function handleFormDeleting(url, form) {
+                const formData = new FormData(form);
+                const secretKey = formData.get("shortKey");
+
+                if (!secretKey) {
+                    document.querySelector('.error').textContent = "Ошибка: не указан ключ!";
+                    document.querySelector('.error').classList.remove('hidden');
+                    document.querySelector('.success').classList.add('hidden');
+                    return;
+                }
+
+                try {
+                    const deleteUrl = `${url}/${secretKey}`;
+
+                    const response = await fetch(deleteUrl, {
+                        method: 'DELETE',
+                        headers: {'Content-Type': 'application/json'},
+                    });
+
+                    const result = await response.json();
+                    console.log("Ответ от сервера:", result);
+                    if (response.ok) {
+                        document.querySelector('.success').classList.remove('hidden');
+                        document.querySelector('.success a').textContent = result.message || 'Удаление прошло успешно!';
+                        document.querySelector('.success a').href = '#';
+                        document.querySelector('.error').classList.add('hidden');
+                    } else {
+                        document.querySelector('.error').textContent = `Ошибка: ${result.error || 'Неизвестная ошибка'}`;
+                        document.querySelector('.error').classList.remove('hidden');
+                        document.querySelector('.success').classList.add('hidden');
+                    }
+                } catch (error) {
+                    document.querySelector('.error').textContent = "Ошибка: невозможно соединиться с сервером.";
+                    document.querySelector('.error').classList.remove('hidden');
+                    document.querySelector('.success').classList.add('hidden');
+                }
+            }
+
