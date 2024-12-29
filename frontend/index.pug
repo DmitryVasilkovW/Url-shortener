@@ -71,8 +71,8 @@ html
             }
 
             .success {
-                background-color: #4CAF50;
-                color: white;
+                background-color: #9eeea3;
+                color: #b0aeae;
                 padding: 20px;
                 font-size: 18px;
                 border-radius: 10px;
@@ -85,6 +85,7 @@ html
         .menu-buttons
             button(onclick="showForm('vip')") Создать VIP ссылку
             button(onclick="showForm('regular')") Создать обычную ссылку
+            button(onclick="showForm('info')") Посмотреть информацию о ссылке
             button(onclick="showForm('delete')") Удалить ссылку
 
         .form-container.hidden#vipForm
@@ -108,6 +109,11 @@ html
             form(id="deleteShortenerForm")
                 input(type="text" placeholder="Введите ключ ссылки" name="shortKey" required)
                 button(type="submit") Удалить ссылку
+
+        .form-container.hidden#infoForm
+            form(id="showInfoShortenerForm")
+                input(type="text" placeholder="Введите ключ ссылки" name="shortKey" required)
+                button(type="submit") посмотреть информацию
 
         .error.hidden Ошибка: Проверьте данные или попробуйте позже.
         .success.hidden Сокращённая ссылка:
@@ -188,7 +194,6 @@ html
                     });
 
                     const result = await response.json();
-                    console.log("Ответ от сервера:", result);
                     if (response.ok) {
                         document.querySelector('.success').classList.remove('hidden');
                         document.querySelector('.success a').textContent = result.message || 'Удаление прошло успешно!';
@@ -206,3 +211,44 @@ html
                 }
             }
 
+            document.getElementById('showInfoShortenerForm').addEventListener('submit', async function (event) {
+                event.preventDefault();
+                await handleFormGettingInfo('/get_info', this);
+            });
+
+            async function handleFormGettingInfo(url, form) {
+                const formData = new FormData(form);
+                const secretKey = formData.get("shortKey");
+
+                if (!secretKey) {
+                    document.querySelector('.error').textContent = "Ошибка: не указан ключ!";
+                    document.querySelector('.error').classList.remove('hidden');
+                    document.querySelector('.success').classList.add('hidden');
+                    return;
+                }
+
+                try {
+                    const deleteUrl = `${url}/${secretKey}`;
+
+                    const response = await fetch(deleteUrl, {
+                        method: 'GET',
+                        headers: {'Content-Type': 'application/json'},
+                    });
+
+                    const result = await response.json();
+                    if (response.ok) {
+                        document.querySelector('.success').classList.remove('hidden');
+                        document.querySelector('.success a').textContent = result.creationDate;
+                        document.querySelector('.success a').href = '#';
+                        document.querySelector('.error').classList.add('hidden');
+                    } else {
+                        document.querySelector('.error').textContent = `Ошибка: ${result.error || 'Неизвестная ошибка'}`;
+                        document.querySelector('.error').classList.remove('hidden');
+                        document.querySelector('.success').classList.add('hidden');
+                    }
+                } catch (error) {
+                    document.querySelector('.error').textContent = "Ошибка: невозможно соединиться с сервером.";
+                    document.querySelector('.error').classList.remove('hidden');
+                    document.querySelector('.success').classList.add('hidden');
+                }
+            }
