@@ -16,7 +16,7 @@ components:
 paths:
   /make_vip_shorter:
     post:
-      description: creates short url
+      description: Creates short vip url
       requestBody:
         required: true
         content:
@@ -27,6 +27,7 @@ paths:
                 longUrl:
                   description: url to make shorter
                   type: string
+                  default: "https://github.com/DmitryVasilkovW/CV"
                 vipKey:
                   description: short key to be mapped to long url
                   type: string
@@ -48,6 +49,11 @@ paths:
                     - DAYS
                   required: false
                   default: HOURS
+            example:
+              longUrl: "https://github.com/DmitryVasilkovW/CV"
+              vipKey: "exampleKey"
+              timeToLive: 10
+              timeToLiveUnit: "HOURS"
       responses:
         '200':
           description: OK
@@ -62,6 +68,134 @@ paths:
                     type: string
         '400':
           description: invalid input parameters
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+  /make_shorter:
+    post:
+      description: Creates short url
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                longUrl:
+                  description: url to make shorter
+                  type: string
+                  default: "https://github.com/DmitryVasilkovW/CV"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  shortUrl:
+                    type: string
+                  secretKey:
+                    type: string
+        '400':
+          description: invalid input parameters
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+  /admin/{secretKey}:
+    get:
+      summary: Get statistics for a redirection
+      description: Returns statistics for the redirection associated with the given secret key.
+      parameters:
+        - name: secretKey
+          in: path
+          description: The secret key associated with the redirection.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully retrieved the redirection statistics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  creationDate:
+                    type: string
+                    format: date-time
+                    description: The creation date of the redirection.
+                  usageCount:
+                    type: integer
+                    description: The number of times the redirection has been used.
+        '404':
+          description: Redirection not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+    delete:
+      summary: Deletes a redirection by secret key
+      description: Deletes a redirection associated with the given secret key.
+      parameters:
+        - name: secretKey
+          in: path
+          description: The secret key associated with the redirection to delete.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully deleted the redirection
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Redirection deleted successfully."
+        '404':
+          description: Redirection not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+  /{shortKey}:
+    get:
+      summary: Redirects to the long URL
+      description: Resolves the short key to its corresponding long URL and redirects the client.
+      parameters:
+        - name: shortKey
+          in: path
+          description: The short key to resolve to a long URL.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Redirects to the resolved long URL
+          headers:
+            Location:
+              description: The URL to which the client should be redirected.
+              schema:
+                type: string
+        '404':
+          description: Redirection not found
           content:
             application/json:
               schema:
