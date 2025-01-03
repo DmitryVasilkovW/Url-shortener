@@ -32,7 +32,7 @@ import java.util.stream.Stream
 @SpringBootTest
 @AutoConfigureMockMvc
 internal class CreateRedirectControllerTest {
-    private val longUrl = "https://yandex.ru"
+    private val longUrl = "https://github.com/DmitryVasilkovW/CV"
     private val mapper = ObjectMapper()
 
     @Autowired
@@ -176,6 +176,7 @@ internal class CreateRedirectControllerTest {
     }
 
     companion object {
+        @JvmStatic
         private fun provideVipKeys(): Stream<Arguments> {
             return Stream.of(
                 Arguments.of("normalKey", 200),
@@ -186,6 +187,7 @@ internal class CreateRedirectControllerTest {
             )
         }
 
+        @JvmStatic
         private fun provideTimeToLive(): Stream<Arguments> {
             var vipKeyIncremented = 0
             return Stream.of(
