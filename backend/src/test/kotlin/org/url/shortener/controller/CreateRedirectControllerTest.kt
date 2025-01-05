@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus
+import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.MvcResult
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
@@ -18,6 +19,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.header
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import org.springframework.transaction.annotation.Transactional
 import org.url.shortener.message.CreateRedirectRequest
 import org.url.shortener.message.CreateRedirectResponse
 import java.util.concurrent.TimeUnit
@@ -40,6 +42,7 @@ internal class CreateRedirectControllerTest {
 
     @Test
     @Throws(Exception::class)
+    @Transactional
     fun simple_redirect() {
         val resp = makeShorterRequest(CreateRedirectRequest(longUrl), "common")
         mockMvc!!.perform(get(resp.shortUrl))
@@ -50,6 +53,7 @@ internal class CreateRedirectControllerTest {
 
     @Test
     @Throws(Exception::class)
+    @Transactional
     fun vipLink_redirect() {
         val vipKey = "test-vip-key"
         val resp = makeShorterRequest(
@@ -72,6 +76,7 @@ internal class CreateRedirectControllerTest {
 
     @Test
     @Throws(Exception::class)
+    @Transactional
     fun duplicate_vipLink() {
         val vipKey = "duplicate"
         for (expectedCode in intArrayOf(200, 400)) {
@@ -86,6 +91,7 @@ internal class CreateRedirectControllerTest {
     @ParameterizedTest
     @MethodSource("provideVipKeys")
     @Throws(Exception::class)
+    @Transactional
     fun test_vipLink(vipKey: String?, expectedCode: Int) {
         expectMakeShorterRequestResponseCode(
             String.format("{\"longUrl\":\"%s\", \"vipKey\": \"%s\"}", longUrl, vipKey),
@@ -96,6 +102,7 @@ internal class CreateRedirectControllerTest {
 
     @Test
     @Throws(Exception::class)
+    @DirtiesContext
     fun check_timeToLive() {
         val vipKey = "my-vip-key"
         val timeToLive: Long = 5
@@ -127,6 +134,7 @@ internal class CreateRedirectControllerTest {
     @ParameterizedTest
     @MethodSource("provideTimeToLive")
     @Throws(Exception::class)
+    @Transactional
     fun test_timeToLive(vipKey: String?, timeToLive: Long, timeToLiveUnit: TimeUnit, expectedCode: Int) {
         expectMakeShorterRequestResponseCode(
             String.format(
